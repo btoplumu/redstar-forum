@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.exceptions import InvalidSignature
@@ -40,6 +41,18 @@ class ThanksModel(BaseModel):
     public_key_b64: str
     thread_id: int
     reply_index: int = -1
+
+# --- Statik Dosyalar ve Kök Dizin Yönlendirmesi (Render / Vercel İçin) ---
+if os.path.exists("static"):
+    app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/")
+def serve_index():
+    index_path = os.path.join("static", "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"error": "index.html bulunamadı"}
+# -----------------------------------------------------------------------
 
 @app.post("/api/register")
 def register_user(user: RegisterModel):

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REDSTAR FORUM</title>
+<style>
+:root {
+    --bg: #050505; --panel: #0d1117; --panel2: #161b22;
+    --header-bg: linear-gradient(to bottom, #111b11, #000000);
+    --header-text: #00ff41; --link: #00ff41; --link-hover: #ff0055;
+    --border: #00ff41; --border-light: #1f381f; --text: #00ff41; --text-muted: #7ee787;
+    --kategori-bg: linear-gradient(to bottom, #1b301b, #0d1a0d); --kategori-text: #00ff41;
+    --btn-bg: linear-gradient(to bottom, #161b22, #0d1117); --btn-border: #00ff41; --btn-text: #00ff41;
+}
+body.tema-redstar {
+    --bg: #080202; --panel: #120505; --panel2: #1c0a0a;
+    --header-bg: linear-gradient(to bottom, #3d0505, #120202);
+    --header-text: #ffcc00; --link: #ff3333; --link-hover: #ffcc00;
+    --border: #ff3333; --border-light: #3d0505; --text: #ffcccc; --text-muted: #ff9999;
+    --kategori-bg: linear-gradient(to bottom, #4a0d0d, #240404); --kategori-text: #ffcc00;
+    --btn-bg: linear-gradient(to bottom, #1c0a0a, #120505); --btn-border: #ff3333; --btn-text: #ffcc00;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Courier New', Courier, monospace; background: var(--bg); color: var(--text); font-size: 12px; line-height: 1.5; padding: 10px; }
+a { color: var(--link); text-decoration: none; cursor: pointer; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+.container { max-width: 950px; margin: auto; }
+.header { background: var(--header-bg); border: 1px solid var(--border); padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.logo-container { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.logo-icon { width: 26px; height: 26px; border-radius: 3px; object-fit: cover; border: 1px solid var(--border); }
+.logo { font-size: 18px; font-weight: bold; font-family: 'Courier New', Courier, monospace; }
+.logo-red { color: #ff4444; }
+.logo-star { color: #ffcc00; }
+.logo-text { color: var(--header-text); }
+.box { background: var(--panel); border: 1px solid var(--border); padding: 12px; margin-bottom: 10px; border-radius: 3px; }
+.kategori-baslik { background: var(--kategori-bg); color: var(--kategori-text); padding: 5px 10px; font-weight: bold; font-size: 11px; border: 1px solid var(--border); margin-top: 10px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+input, textarea, select { width: 100%; background: var(--panel2); color: var(--text); border: 1px solid var(--border); padding: 6px; font-family: 'Courier New', Courier, monospace; margin-bottom: 8px; outline: none; }
+input:focus, textarea:focus, select:focus { border-color: var(--link-hover); }
+button { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--btn-text); padding: 5px 12px; font-size: 11px; font-family: 'Courier New', Courier, monospace; cursor: pointer; font-weight: bold; border-radius: 3px; }
+button:hover { background: var(--link-hover); color: #000; }
+.thread-row { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid var(--border-light); background: var(--panel); cursor: pointer; align-items: center; }
+.thread-row:hover { background: var(--panel2); }
+.author-box { display: flex; align-items: center; gap: 8px; }
+.author-avatar { width: 32px; height: 32px; border-radius: 3px; object-fit: cover; border: 1px solid var(--border); }
+.author-info { display: flex; flex-direction: column; }
+.author-name { font-weight: bold; color: var(--link); font-size: 11px; }
+.author-bio { color: var(--text-muted); font-size: 9px; font-style: italic; }
+.meta { font-size: 9px; color: var(--text-muted); text-align: right; }
+.identity-badge { font-size: 10px; color: var(--header-text); background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.identity-badge img { width: 16px; height: 16px; border-radius: 2px; object-fit: cover; }
+.tag { background: var(--kategori-bg); color: var(--kategori-text); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; font-size: 9px; margin-right: 5px; }
+.filter-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.filter-btn { background: var(--panel); border: 1px solid var(--border); color: var(--text); padding: 2px 6px; font-size: 9px; cursor: pointer; border-radius: 2px; }
+.filter-btn.aktif, .filter-btn:hover { background: var(--link-hover); color: #000; }
+.search-bar { display: flex; gap: 5px; margin-bottom: 10px; }
+pre code { background: #000; color: #00ff41; padding: 8px; display: block; border-radius: 4px; overflow-x: auto; font-family: monospace; border: 1px solid var(--border); }
+code { background: rgba(0,255,65,0.1); padding: 2px 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-container" onclick="currentFilter='Tümü'; currentSearchQuery=''; loadHome()">
+            <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.etsystatic.com%2F24007829%2Fr%2Fil%2F57906b%2F4708413160%2Fil_800x800.4708413160_c8ip.jpg&f=1&nofb=1&ipt=8edb7f017a06a0917f090c5353cf9a54518f00c3b1629fcf7ae2b2aeb66bc1f4&ipo=images" alt="V" class="logo-icon">
+            <div class="logo"><span class="logo-red">RED</span><span class="logo-star">STAR</span> <span class="logo-text">FORUM</span></div>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <div id="identity-info" class="identity-badge" onclick="loadProfile()" title="Profili Düzenle">Profil Yükleniyor...</div>
+            <button onclick="anahtarIndir()">Anahtarı İndir</button>
+            <button onclick="document.getElementById('import-file').click()">Anahtar Yükle</button>
+            <input type="file" id="import-file" style="display:none" onchange="anahtarYukle(event)">
+            <button onclick="temaDegistir()">Tema</button>
+        </div>
+    </div>
+
+    <div id="app-view"></div>
+</div>
+
+<script>
+    let signingKey = null;
+    let publicKeyB64 = null;
+    let currentProfile = { username: "Anonim", avatar_url: "", bio: "", reputation: 0 };
+    let currentFilter = 'Tümü';
+    let currentSearchQuery = '';
+    let currentViewThreadId = null;
+    let pollInterval = null;
+    let currentTemaIndex = 0;
+    let tempAvatarBase64 = null;
+    
+    // Sadece Anonymous ve RedStar temaları kaldı
+    const temalar = ['', 'tema-redstar'];
+
+    async function initIdentity() {
+        let rawPrivKey = localStorage.getItem('redstar_priv');
+        let rawPubKey = localStorage.getItem('redstar_pub');
+
+        if (!rawPrivKey || !rawPubKey) {
+            signingKey = await window.crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"]);
+            const pubBytes = await window.crypto.subtle.exportKey("raw", signingKey.publicKey);
+            const privBytes = await window.crypto.subtle.exportKey("pkcs8", signingKey.privateKey);
+            publicKeyB64 = btoa(String.fromCharCode(...new Uint8Array(pubBytes)));
+            localStorage.setItem('redstar_pub', publicKeyB64);
+            localStorage.setItem('redstar_priv', btoa(String.fromCharCode(...new Uint8Array(privBytes))));
+        } else {
+            publicKeyB64 = rawPubKey;
+            const privBytes = Uint8Array.from(atob(rawPrivKey), c => c.charCodeAt(0));
+            signingKey = {
+                privateKey: await window.crypto.subtle.importKey("pkcs8", privBytes, { name: "Ed25519" }, true, ["sign"]),
+                publicKey: null
+            };
+        }
+
+        const res = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ public_key_b64: publicKeyB64 })
+        });
+        const data = await res.json();
+        
+        const savedLocalProfile = localStorage.getItem('redstar_profile_' + publicKeyB64);
+        if (savedLocalProfile) {
+            try {
+                currentProfile = JSON.parse(savedLocalProfile);
+                await fetch('/api/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ public_key_b64: publicKeyB64, username: currentProfile.username, avatar_url: currentProfile.avatar_url, bio: currentProfile.bio })
+                });
+            } catch (e) {
+                currentProfile = data.profile;
+            }
+        } else {
+            currentProfile = data.profile;
+        }
+
+        updateIdentityBadge();
+        loadHome();
+        startPolling();
+    }
+
+    function updateIdentityBadge() {
+        const badge = document.getElementById('identity-info');
+        if (badge) {
+            badge.innerHTML = `<img src="${escapeHtml(currentProfile.avatar_url || '')}" alt=""> ${escapeHtml(currentProfile.username || 'Anonim')} [⭐ ${currentProfile.reputation || 0}]`;
+        }
+    }
+
+    function anahtarIndir() {
+        const priv = localStorage.getItem('redstar_priv');
+        const pub = localStorage.getItem('redstar_pub');
+        const data = JSON.stringify({ private_key: priv, public_key: pub }, null, 2);
+        const blob = new Blob([data], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = "redstar_identity.json";
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function anahtarYukle(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const keys = JSON.parse(e.target.result);
+                if (!keys.private_key || !keys.public_key) throw new Error("Geçersiz anahtar dosyası!");
+                localStorage.setItem('redstar_priv', keys.private_key);
+                localStorage.setItem('redstar_pub', keys.public_key);
+                alert("Kimlik başarıyla yüklendi! Sayfa yenileniyor...");
+                location.reload();
+            } catch (err) {
+                alert("Hata: " + err.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function loadProfile() {
+        currentViewThreadId = null;
+        tempAvatarBase64 = null;
+        let html = `
+            <button onclick="loadHome()" style="margin-bottom:10px;">← Ana Sayfaya Dön</button>
+            <div class="box">
+                <h3 style="margin-bottom:8px; font-size:13px;">👤 PROFİL & İTİBAR</h3>
+                <p style="color:var(--text-muted); margin-bottom:5px; font-size:10px;">
+                    İtibar Puanı (Reputation): <strong style="color:var(--link-hover);">⭐ ${currentProfile.reputation || 0} Puan</strong>
+                </p>
+                <p style="color:var(--text-muted); margin-bottom:10px; font-size:10px;">
+                    Kriptografik Kimlik: <code style="word-break: break-all;">${publicKeyB64}</code>
+                </p>
+                
+                <label style="display:block; margin-bottom:4px; font-weight:bold;">Görünen İsim (Display Username):</label>
+                <input type="text" id="profile-username" value="${escapeHtml(currentProfile.username || '')}" maxlength="20">
+
+                <label style="display:block; margin-bottom:4px; font-weight:bold;">Profil Fotoğrafı Yükle:</label>
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px;">
+                    <img id="preview-avatar" src="${escapeHtml(currentProfile.avatar_url || '')}" style="width:40px; height:40px; border-radius:4px; object-fit:cover; border:1px solid var(--border);">
+                    <input type="file" id="avatar-file-input" accept="image/*" onchange="previewAvatarFile(event)">
+                </div>
+
+                <label style="display:block; margin-bottom:4px; font-weight:bold;">Kısa Bio:</label>
+                <input type="text" id="profile-bio" value="${escapeHtml(currentProfile.bio || '')}" maxlength="100">
+
+                <button onclick="saveProfile()" style="margin-top:10px;">Profili Kaydet</button>
+            </div>
+        `;
+        document.getElementById('app-view').innerHTML = html;
+    }
+
+    function previewAvatarFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            tempAvatarBase64 = e.target.result;
+            const preview = document.getElementById('preview-avatar');
+            if (preview) preview.src = tempAvatarBase64;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function saveProfile() {
+        const usernameEl = document.getElementById('profile-username');
+        const bioEl = document.getElementById('profile-bio');
+        if (!usernameEl || !bioEl) return;
+
+        const username = usernameEl.value.trim();
+        const bio = bioEl.value.trim();
+        const avatar_url = tempAvatarBase64 ? tempAvatarBase64 : currentProfile.avatar_url;
+        
+        if (!username) return alert("Kullanıcı adı boş olamaz!");
+
+        const res = await fetch('/api/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ public_key_b64: publicKeyB64, username, avatar_url, bio })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            currentProfile = data.profile;
+            tempAvatarBase64 = null;
+            
+            localStorage.setItem('redstar_profile_' + publicKeyB64, JSON.stringify(currentProfile));
+
+            updateIdentityBadge();
+            alert("Profil başarıyla güncellendi ve kaydedildi!");
+            loadHome();
+        } else {
+            alert("Güncellenemedi!");
+        }
+    }
+
+    function parseMarkdown(text) {
+        let safe = escapeHtml(text || '');
+        safe = safe.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+        safe = safe.replace(/`([^`]+)`/g, '<code>$1</code>');
+        safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        return safe;
+    }
+
+    async function loadHome() {
+        currentViewThreadId = null;
+        const res = await fetch('/api/threads');
+        const threads = await res.json();
+        
+        let html = `
+            <div class="box">
+                <h3 style="margin-bottom:8px; font-size:12px;">YENİ KONU AÇ</h3>
+                <select id="new-category">
+                    <option value="🔓 Tersine Mühendislik">🔓 Tersine Mühendislik (Reverse Engineering)</option>
+                    <option value="🌐 Web Güvenliği">🌐 Web Güvenliği & Zafiyetler</option>
+                    <option value="📧 Mail Güvenliği">📧 Mail Güvenliği & OSINT</option>
+                    <option value="🛡️ Ağ Güvenliği">🛡️ Ağ Güvenliği & VPN</option>
+                    <option value="🎯 Sızma Testleri">🎯 Sızma Testleri & Bug Bounty</option>
+                    <option value="🦠 Zararlı Yazılım">🦠 Zararlı Yazılım Analizi</option>
+                    <option value="💻 Python & Otomasyon">💻 Python & Otomasyon</option>
+                    <option value="⚙️ Düşük Seviye (C/Rust)">⚙️ Düşük Seviye (C / Rust)</option>
+                    <option value="💬 Genel Kürsü">💬 Genel Kürsü</option>
+                </select>
+                <input type="text" id="new-title" placeholder="Konu Başlığı">
+                <textarea id="new-content" placeholder="Mesaj içeriği (Markdown ve kod blokları desteklenir)..." rows="4"></textarea>
+                <button onclick="createThread()">Konuyu Gönder</button>
+            </div>
+
+            <div class="box" style="padding: 8px;">
+                <div class="search-bar">
+                    <input type="text" id="search-input" value="${escapeHtml(currentSearchQuery)}" placeholder="Konu başlığı veya içerikte ara..." style="margin-bottom:0;">
+                    <button onclick="triggerSearch()">Ara</button>
+                    ${currentSearchQuery ? '<button onclick="clearSearch()">Sıfırla</button>' : ''}
+                </div>
+            </div>
+
+            <div class="kategori-baslik">
+                <span>📁 Forum Kategorileri</span>
+                <div class="filter-tabs">
+                    <button class="filter-btn ${currentFilter === 'Tümü' ? 'aktif' : ''}" onclick="setFilter('Tümü')">Tümü</button>
+                    <button class="filter-btn ${currentFilter === '🔓 Tersine Mühendislik' ? 'aktif' : ''}" onclick="setFilter('🔓 Tersine Mühendislik')">RevEng</button>
+                    <button class="filter-btn ${currentFilter === '🌐 Web Güvenliği' ? 'aktif' : ''}" onclick="setFilter('🌐 Web Güvenliği')">Web Sec</button>
+                    <button class="filter-btn ${currentFilter === '📧 Mail Güvenliği' ? 'aktif' : ''}" onclick="setFilter('📧 Mail Güvenliği')">Mail Sec</button>
+                    <button class="filter-btn ${currentFilter === '🛡️ Ağ Güvenliği' ? 'aktif' : ''}" onclick="setFilter('🛡️ Ağ Güvenliği')">Ağ</button>
+                    <button class="filter-btn ${currentFilter === '🎯 Sızma Testleri' ? 'aktif' : ''}" onclick="setFilter('🎯 Sızma Testleri')">Pentest</button>
+                    <button class="filter-btn ${currentFilter === '🦠 Zararlı Yazılım' ? 'aktif' : ''}" onclick="setFilter('🦠 Zararlı Yazılım')">Malware</button>
+                    <button class="filter-btn ${currentFilter === '💻 Python & Otomasyon' ? 'aktif' : ''}" onclick="setFilter('💻 Python & Otomasyon')">Python</button>
+                    <button class="filter-btn ${currentFilter === '⚙️ Düşük Seviye (C/Rust)' ? 'aktif' : ''}" onclick="setFilter('⚙️ Düşük Seviye (C/Rust)')">C/Rust</button>
+                    <button class="filter-btn ${currentFilter === '💬 Genel Kürsü' ? 'aktif' : ''}" onclick="setFilter('💬 Genel Kürsü')">Genel</button>
+                </div>
+            </div>
+            <div class="kategori-baslik" style="background:var(--panel2); color:var(--text); border-top:none;">📋 Konu Listesi (${currentFilter})</div>
+        `;
+
+        let filteredThreads = currentFilter === 'Tümü' 
+            ? threads 
+            : threads.filter(t => t.category === currentFilter);
+
+        if (currentSearchQuery) {
+            const q = currentSearchQuery.toLowerCase();
+            filteredThreads = filteredThreads.filter(t => t.title.toLowerCase().includes(q) || t.content.toLowerCase().includes(q));
+        }
+
+        if (filteredThreads.length === 0) {
+            html += `<div class="box" style="text-align:center; color:var(--text-muted);">Hiçbir konu bulunamadı.</div>`;
+        } else {
+            filteredThreads.slice().reverse().forEach(t => {
+                const catTag = t.category ? `<span class="tag">${escapeHtml(t.category)}</span>` : '';
+                const author = t.author || { username: 'Anonim', avatar_url: '', bio: '', reputation: 0 };
+                html += `
+                    <div class="thread-row" onclick="loadThreadDetail(${t.id})">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <img src="${escapeHtml(author.avatar_url || '')}" class="author-avatar" alt="">
+                            <div>
+                                ${catTag}<strong>${escapeHtml(t.title)}</strong>
+                                <div class="author-info">
+                                    <span class="author-name">${escapeHtml(author.username)} [⭐${author.reputation || 0}]</span>
+                                    <span class="author-bio">"${escapeHtml(author.bio || '')}"</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="meta">
+                            ⭐ Teşekkür: ${t.thanks_count}<br>
+                            Yanıt: ${t.reply_count} | ${new Date(t.timestamp * 1000).toLocaleTimeString()}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        document.getElementById('app-view').innerHTML = html;
+    }
+
+    function setFilter(cat) {
+        currentFilter = cat;
+        loadHome();
+    }
+
+    function triggerSearch() {
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            currentSearchQuery = searchInput.value.trim();
+            loadHome();
+        }
+    }
+
+    function clearSearch() {
+        currentSearchQuery = '';
+        loadHome();
+    }
+
+    async function createThread() {
+        const catEl = document.getElementById('new-category');
+        const titleEl = document.getElementById('new-title');
+        const contentEl = document.getElementById('new-content');
+        if (!catEl || !titleEl || !contentEl) return;
+
+        const category = catEl.value;
+        const title = titleEl.value.trim();
+        const content = contentEl.value.trim();
+        if (!title || !content) return;
+
+        const timestamp = Math.floor(Date.now() / 1000);
+        const messageStr = `${category}:${title}:${content}:${timestamp}`;
+        const signatureBytes = await window.crypto.subtle.sign({ name: "Ed25519" }, signingKey.privateKey, new TextEncoder().encode(messageStr));
+        const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signatureBytes)));
+
+        const res = await fetch('/api/threads', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ public_key_b64: publicKeyB64, category, title, content, timestamp, signature_b64: signatureB64 })
+        });
+
+        if (res.ok) loadHome();
+        else alert("İmza hatası!");
+    }
+
+    async function sendThanks(threadId, replyIndex = -1) {
+        const res = await fetch('/api/thanks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ public_key_b64: publicKeyB64, thread_id: threadId, reply_index: replyIndex })
+        });
+        if (res.ok) {
+            loadThreadDetail(threadId);
+        } else {
+            alert("Teşekkür gönderilemedi!");
+        }
+    }
+
+    async function loadThreadDetail(id) {
+        currentViewThreadId = id;
+        const res = await fetch(`/api/threads/${id}`);
+        const t = await res.json();
+        const author = t.author || { username: 'Anonim', avatar_url: '', bio: '', reputation: 0 };
+
+        let html = `
+            <button onclick="loadHome()" style="margin-bottom:10px;">← Ana Sayfaya Dön</button>
+            <div class="box">
+                <span class="tag">${escapeHtml(t.category)}</span>
+                <h2 style="font-size:14px; margin-top:5px; margin-bottom:8px; color:var(--link);">${escapeHtml(t.title)}</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-light); padding-bottom:8px; margin-bottom:10px;">
+                    <div class="author-box">
+                        <img src="${escapeHtml(author.avatar_url || '')}" class="author-avatar" alt="">
+                        <div class="author-info">
+                            <span class="author-name">${escapeHtml(author.username)} [⭐${author.reputation || 0}]</span>
+                            <span class="author-bio">"${escapeHtml(author.bio || '')}"</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button onclick="sendThanks(${t.id}, -1)">⭐ Teşekkür Et (${t.thanks_count})</button>
+                    </div>
+                </div>
+                <div style="white-space: pre-wrap; margin-top:10px;">${parseMarkdown(t.content)}</div>
+            </div>
+            <div class="kategori-baslik">💬 Yanıtlar</div>
+            <div id="replies-container">
+        `;
+
+        if (t.replies.length === 0) {
+            html += `<div class="box" style="text-align:center; color:var(--text-muted);">Bu konuya henüz yanıt yazılmamış.</div>`;
+        } else {
+            t.replies.forEach((r, idx) => {
+                const rAuthor = r.author || { username: 'Anonim', avatar_url: '', bio: '', reputation: 0 };
+                html += `
+                    <div class="box">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <div class="author-box">
+                                <img src="${escapeHtml(rAuthor.avatar_url || '')}" class="author-avatar" alt="">
+                                <div class="author-info">
+                                    <span class="author-name">${escapeHtml(rAuthor.username)} [⭐${rAuthor.reputation || 0}]</span>
+                                    <span class="author-bio">"${escapeHtml(rAuthor.bio || '')}"</span>
+                                </div>
+                            </div>
+                            <div>
+                                <button onclick="sendThanks(${t.id}, ${idx})">⭐ Teşekkür Et (${r.thanks_count})</button>
+                            </div>
+                        </div>
+                        <div style="margin-top:4px; white-space: pre-wrap;">${parseMarkdown(r.content)}</div>
+                    </div>
+                `;
+            });
+        }
+
+        html += `
+            </div>
+            <div class="box" style="margin-top: 15px;">
+                <h3 style="margin-bottom:8px; font-size:12px;">Yanıt Yaz</h3>
+                <textarea id="reply-content" placeholder="Yanıtınızı yazın..." rows="3"></textarea>
+                <button onclick="sendReply(${t.id})">Yanıtı Gönder</button>
+            </div>
+        `;
+        document.getElementById('app-view').innerHTML = html;
+    }
+
+    async function sendReply(threadId) {
+        const replyEl = document.getElementById('reply-content');
+        if (!replyEl) return;
+        const content = replyEl.value.trim();
+        if (!content) return;
+
+        const timestamp = Math.floor(Date.now() / 1000);
+        const messageStr = `${threadId}:${content}:${timestamp}`;
+        const signatureBytes = await window.crypto.subtle.sign({ name: "Ed25519" }, signingKey.privateKey, new TextEncoder().encode(messageStr));
+        const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signatureBytes)));
+
+        const res = await fetch('/api/reply', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ public_key_b64: publicKeyB64, thread_id: threadId, content, timestamp, signature_b64: signatureB64 })
+        });
+
+        if (res.ok) loadThreadDetail(threadId);
+        else alert("Yanıt gönderilemedi!");
+    }
+
+    function startPolling() {
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(async () => {
+            if (currentViewThreadId !== null) {
+                try {
+                    const res = await fetch(`/api/threads/${currentViewThreadId}`);
+                    if (res.ok) {
+                        const t = await res.json();
+                        const container = document.getElementById('replies-container');
+                        if (container) {
+                            let repliesHtml = '';
+                            if (t.replies.length === 0) {
+                                repliesHtml = `<div class="box" style="text-align:center; color:var(--text-muted);">Bu konuya henüz yanıt yazılmamış.</div>`;
+                            } else {
+                                t.replies.forEach((r, idx) => {
+                                    const rAuthor = r.author || { username: 'Anonim', avatar_url: '', bio: '', reputation: 0 };
+                                    repliesHtml += `
+                                        <div class="box">
+                                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                                <div class="author-box">
+                                                    <img src="${escapeHtml(rAuthor.avatar_url || '')}" class="author-avatar" alt="">
+                                                    <div class="author-info">
+                                                        <span class="author-name">${escapeHtml(rAuthor.username)} [⭐${rAuthor.reputation || 0}]</span>
+                                                        <span class="author-bio">"${escapeHtml(rAuthor.bio || '')}"</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <button onclick="sendThanks(${t.id}, ${idx})">⭐ Teşekkür Et (${r.thanks_count})</button>
+                                                </div>
+                                            </div>
+                                            <div style="margin-top:4px; white-space: pre-wrap;">${parseMarkdown(r.content)}</div>
+                                        </div>
+                                    `;
+                                });
+                            }
+                            if (container.innerHTML !== repliesHtml) {
+                                container.innerHTML = repliesHtml;
+                            }
+                        }
+                    }
+                } catch (e) {}
+            }
+        }, 3000);
+    }
+
+    function temaDegistir() {
+        currentTemaIndex = (currentTemaIndex + 1) % temalar.length;
+        document.body.className = temalar[currentTemaIndex];
+        localStorage.setItem('redstar_tema', temalar[currentTemaIndex]);
+    }
+
+    function temaYukle() {
+        const savedTema = localStorage.getItem('redstar_tema') || '';
+        document.body.className = savedTema;
+        currentTemaIndex = temalar.indexOf(savedTema);
+        if (currentTemaIndex === -1) currentTemaIndex = 0;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    window.onload = function() {
+        temaYukle();
+        initIdentity();
+    };
+</script>
+</body>
+</html>

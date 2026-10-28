@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.exceptions import InvalidSignature
@@ -42,7 +42,7 @@ class ThanksModel(BaseModel):
     thread_id: int
     reply_index: int = -1
 
-# --- Statik Dosyalar ve Kök Dizin Yönlendirmesi (Render / Vercel İçin) ---
+# --- Statik Dosyalar, Kök Dizin ve SEO Yönlendirmeleri ---
 if os.path.exists("static"):
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -52,7 +52,22 @@ def serve_index():
     if os.path.exists(index_path):
         return FileResponse(index_path)
     return {"error": "index.html bulunamadı"}
-# -----------------------------------------------------------------------
+
+@app.get("/robots.txt", response_class=PlainTextResponse)
+def robots_txt():
+    robots_path = os.path.join("static", "robots.txt")
+    if os.path.exists(robots_path):
+        with open(robots_path, "r", encoding="utf-8") as f:
+            return f.read()
+    return "User-agent: *\nAllow: /"
+
+@app.get("/sitemap.xml")
+def sitemap_xml():
+    sitemap_path = os.path.join("static", "sitemap.xml")
+    if os.path.exists(sitemap_path):
+        return FileResponse(sitemap_path, media_type="application/xml")
+    raise HTTPException(status_code=404, detail="Sitemap not found")
+# -------------------------------------------------------
 
 @app.post("/api/register")
 def register_user(user: RegisterModel):
